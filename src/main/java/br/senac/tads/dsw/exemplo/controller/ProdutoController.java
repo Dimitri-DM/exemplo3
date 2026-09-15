@@ -17,6 +17,7 @@ import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import br.senac.tads.dsw.exemplo.model.Produto;
 import br.senac.tads.dsw.exemplo.repository.ProdutoRepository;
+import jakarta.validation.Valid;
 
 @RestController
 @RequestMapping("/api/produtos")
@@ -29,7 +30,7 @@ public class ProdutoController {
     }
 
     @PostMapping
-    public ResponseEntity<Produto> criarProduto(@RequestBody Produto produto) {
+    public ResponseEntity<Produto> criarProduto(@RequestBody @Valid Produto produto) {
         
         Produto produtoSalvo = repository.save(produto);
 
@@ -61,7 +62,7 @@ public class ProdutoController {
 
     @PutMapping("/{id}")
     public ResponseEntity<Produto> atualizarProduto(@PathVariable Long id,
-                                            @RequestBody Produto produtoAtualizado) {
+                                            @RequestBody @Valid Produto produtoAtualizado) {
         
         Optional<Produto> produtoBuscado = repository.findById(id);
 
