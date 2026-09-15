@@ -16,65 +16,72 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import br.senac.tads.dsw.exemplo.model.Avaliacao;
-import br.senac.tads.dsw.exemplo.model.Avaliacao;
-import br.senac.tads.dsw.exemplo.repository.ProdutoRepository;
+import br.senac.tads.dsw.exemplo.repository.AvaliacaoRepository;
 import jakarta.validation.Valid;
-import org.springframework.web.bind.annotation.RequestParam;
-
 
 @RestController
-@RequestMapping("/api/produtos")
+@RequestMapping("/api/avaliacoes")
+public class AvaliacaoController {
 
-public class AvaliacaoController{     
-    private final AvaliacaoController repository;
+    private final AvaliacaoRepository repository;
 
-    public AvaliacaoController(AvaliacaoController repository) {
+    public AvaliacaoController(AvaliacaoRepository repository) {
         this.repository = repository;
     }
- @GetMapping
+
+    @GetMapping
     public List<Avaliacao> listarTodos() {
         return repository.findAll();
     }
 
     @GetMapping("/{id}")
     public ResponseEntity<Avaliacao> buscarPorId(@PathVariable Long id) {
-        
-        Optional<Avaliacao> AvaliacaoBuscada = repository.findById(id);
+        Optional<Avaliacao> avaliacaoBuscada = repository.findById(id);
 
-        if (AvaliacaoBuscada.isPresent()) {
-            return ResponseEntity.ok(AvaliacaoBuscada.get());
+        if (avaliacaoBuscada.isPresent()) {
+            return ResponseEntity.ok(avaliacaoBuscada.get());
         } else {
             return ResponseEntity.notFound().build();
         }
     }
 
-     @PutMapping("/{id}")
+    @PostMapping
+    public ResponseEntity<Avaliacao> criarAvaliacao(@RequestBody @Valid Avaliacao novaAvaliacao) {
+        Avaliacao avaliacaoSalva = repository.save(novaAvaliacao);
+        
+        URI location = ServletUriComponentsBuilder.fromCurrentRequest()
+                .path("/{id}")
+                .buildAndExpand(avaliacaoSalva.getId())
+                .toUri();
+
+        return ResponseEntity.created(location).body(avaliacaoSalva);
+    }
+
+    @PutMapping("/{id}")
     public ResponseEntity<Avaliacao> atualizarAvaliacao(@PathVariable Long id,
-                                            @RequestBody @Valid Avaliacao AvaliacaoAtualizada) {
+                                                         @RequestBody @Valid Avaliacao avaliacaoAtualizada) {
         
-        Optional<Avaliacao> AvaliacaoBuscada = repository.findById(id);
+        Optional<Avaliacao> avaliacaoBuscada = repository.findById(id);
 
-        if (AvaliacaoBuscada.isPresent()) {
-            Avaliacao produtoExistente = AvaliacaoBuscada.get();
+        if (avaliacaoBuscada.isPresent()) {
+            Avaliacao avaliacaoExistente = avaliacaoBuscada.get();
 
-            AvaliacaoExistente.setNome(AvaliacaoAtualizada.getNome());
-            AvaliacaoExistente.setPreco(AvaliacaoAtualizada.getPreco());
+            avaliacaoExistente.setAutor(avaliacaoAtualizada.getAutor());
+            avaliacaoExistente.setNota(avaliacaoAtualizada.getNota());
 
-            Avaliacao AvaliacaoSalva = repository.save(AvaliacaoExistente);
-            
-            return ResponseEntity.ok(AvaliacaoSalva);
+            Avaliacao avaliacaoSalva = repository.save(avaliacaoExistente);
+            return ResponseEntity.ok(avaliacaoSalva);
         } else {
             return ResponseEntity.notFound().build();
         }
     }
+
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> apagarAvaliacao(@PathVariable Long id) {
+        Optional<Avaliacao> avaliacaoBuscada = repository.findById(id);
 
-        Optional<Avaliacao> AvaliacaoBuscada = repository.findById(id);
-
-        if (AvaliacaoBuscada.isPresent()) {
+        if (avaliacaoBuscada.isPresent()) {
             repository.deleteById(id);
-
             return ResponseEntity.noContent().build();
         } else {
             return ResponseEntity.notFound().build();

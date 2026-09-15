@@ -16,7 +16,7 @@ import jakarta.validation.constraints.NotNull;
 @Entity
 public class Avaliacao {
     @Id 
-    @GeneratedValue(strategy = GenerationType.IDENTITY);
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @NotBlank
@@ -30,7 +30,7 @@ public class Avaliacao {
     private Integer nota;
 
     @ManyToOne 
-    @JoinColumn (name = "produto_id");
+    @JoinColumn (name = "produto_id")
     private Produto produto;
 
     public Long getId() {
@@ -72,6 +72,5 @@ public class Avaliacao {
     public void setProduto(Produto produto) {
         this.produto = produto;
     }
-
 
 }
